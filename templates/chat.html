@@ -28,7 +28,7 @@
             //create the socket
             var protocol = window.location.protocol
             
-            while (True){
+            while (true){
                 var socket = io.connect( "https://" + document.domain + ':' + location.port + '/chat', {'sync disconnect on unload': true});
                 sleep(5);
             }
