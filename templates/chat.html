@@ -30,9 +30,9 @@
 
             var socket = io.connect( "https://" + document.domain + ':' + location.port + '/chat', {'sync disconnect on unload': true});
 
-            io.configure(function () { 
-                io.set("transports", ["xhr-polling"]); 
-                io.set("polling duration", 10); 
+            socket.configure(function () { 
+                socket.set("transports", ["xhr-polling"]); 
+                socket.set("polling duration", 10); 
             });
             //on connect, emit join
             socket.on('connect', function(){
