@@ -11,7 +11,9 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-            
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
             const username = `{{ username|e }}`;
             const room = `{{ room|e }}`;
 
@@ -30,7 +32,7 @@
             
             while (true){
                 var socket = io.connect( "https://" + document.domain + ':' + location.port + '/chat', {'sync disconnect on unload': true});
-                sleep(5);
+                sleep(5000);
             }
             
 
