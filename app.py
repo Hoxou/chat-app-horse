@@ -9,7 +9,7 @@ app.debug = True
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
 
-socketio = SocketIO(app, manage_session=False)
+socketio = SocketIO(app, manage_session=False, cors_allowed_origins='https://socialworks.herokuapp.com')
 
 Session(app)
 
