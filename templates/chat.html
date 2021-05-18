@@ -30,10 +30,7 @@
 
             var socket = io.connect( "https://" + document.domain + ':' + location.port + '/chat', {'sync disconnect on unload': true});
 
-            socket.configure(function () { 
-                socket.set("transports", ["xhr-polling"]); 
-                socket.set("polling duration", 10); 
-            });
+         
             //on connect, emit join
             socket.on('connect', function(){
                 socket.emit('join', {username:username, room:room});
