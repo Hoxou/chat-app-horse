@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/style.css" rel="stylesheet">
+    <title>Chat</title>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            
+            const username = `{{ username|e }}`;
+            const room = `{{ room|e }}`;
+
+            //on key press 'enter', directly send the message
+            $("#text").keyup(function(event) {
+                if (event.keyCode === 13) {
+                    $("#send").click();
+                }
+            });
+
+
+
+
+            //create the socket
+            var protocol = window.location.protocol
+
+            var socket = io.connect( "https://" + document.domain + ':' + location.port + '/chat', {'sync disconnect on unload': true});
+
+            //on connect, emit join
+            socket.on('connect', function(){
+                socket.emit('join', {username:username, room:room});
+
+            });
+
+            //on status, data={msg: "username has entered the chat"} or data={msg: "username has left the chat"}.
+            socket.on('status', function(data) {
+                $("#messages").append("<li><b>"+data.user+"</b><i> "+data.msg+"</i></li>");
+            });
+
+            //on message, data={msg: "username : msg"}.
+            socket.on('message', function(data) {
+                var current = new Date();
+                var minutes = current.getMinutes();
+                var hours = current.getHours();
+                var time = ( hours < 10 ? '0' : '' ) + hours +':'+( minutes < 10 ? '0' : '' ) + minutes + '&#160&#160';
+
+                $("#messages").append("<li class='message'><i style='color: #DC7C7C'>" + time + "</i><b><big>" + data.user + " : </big></b>" + data.msg + "</li>");
+            });
+
+            //on message sent, take the text from the input, clear it and then send it as "message['msg']", in def text(message).
+            $('#send').click(function(e) {
+                if ($('#text').val() != ''){
+                    text = $('#text').val();
+                    $('#text').val('');
+                    socket.emit('text', {msg: text, username:username, room:room});
+                }
+                
+            });
+
+            $('#leave').click(function(e) {
+                socket.emit('left', {room:room, username:username}, function() {
+                socket.disconnect();
+                // go back to the login page
+                window.location.href = '/';
+                });
+            });
+
+
+            //some tests 
+            window.addEventListener('beforeunload', function (e) {
+                socket.emit('left', {username:username, room:room});
+                socket.send("A user has been disconnected");
+            });
+
+            socket.on('disconnect', function(){
+                socket.emit('left', {username:username, room:room});
+                socket.disconnect();
+            });
+        });
+
+
+
+    </script>
+
+</head>
+<body>
+
+    <div class="commandBar">
+        <img id="logo" src="../static/img/la_horse-head.svg" alt="horse head">
+        <div class="chatwindow">
+            <h2>Room : {{ room }}</h2><br />
+            <ul id="messages">
+            </ul>
+            <div class="send-bar">
+                <input type="text" id="text" size="60" placeholder="Enter your message here">
+                <img id="send" src="../static/img/akar-icons_send.svg" alt="send">
+            </div>
+            
+        </div>
+        <img id="leave" src="../static/img/cross.svg" alt="go-back">
+    </div>
+</body>
+</html>
